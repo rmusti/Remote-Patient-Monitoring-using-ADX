@@ -7,7 +7,7 @@ For our use case where we are remotely monitoring patient vitals, Azure Data Exp
 
 ## Solution Architecture
 
-![Solution Architecture](Solution Architecture.jpg)
+![Solution Architecture](https://github.com/rmusti/Remote-Patient-Monitoring-using-ADX/blob/bdb0aeab7a61ed7384fd0194c301c52e241e2289/Solution%20Architecture.jpg)
 
 ## Data Flow
 1.	Patient Vitals like Heartbeat, Spo2, Body Temperature, Systolic and Diastolic pressure are collected and streamed using Medical Devices/IoMT. 
