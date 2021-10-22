@@ -1,0 +1,55 @@
+﻿
+// Alter Ingestion Batching Policy
+////////////////////////////////////////////////////////////
+.alter table PatientIoTM policy ingestionbatching @'{"MaximumBatchingTimeSpan":"00:00:11", "MaximumNumberOfItems": 30, "MaximumRawDataSizeMB": 100}'
+
+.show table PatientIoTM policy ingestionbatching 
+
+// Create Table command
+////////////////////////////////////////////////////////////
+.create table PatientIoTM (patientId: int, timeStamp: datetime, bodyTemperature: real, heartRate: int, spo2: int, systolicPressure: int, diastolicPressure: int) 
+
+
+
+// Create mapping command
+////////////////////////////////////////////////////////////
+.create table ['PatientIoTM'] ingestion json mapping 'PatientIoTM_mapping_1' '[{"column":"patientId", "Properties":{"Path":"$[\'patientId\']"}},{"column":"timeStamp", "Properties":{"Path":"$[\'timeStamp\']"}},{"column":"bodyTemperature", "Properties":{"Path":"$[\'bodyTemperature\']"}},{"column":"heartRate", "Properties":{"Path":"$[\'heartRate\']"}},{"column":"spo2", "Properties":{"Path":"$[\'spo2\']"}},{"column":"systolicPressure", "Properties":{"Path":"$[\'systolicPressure\']"}},{"column":"diastolicPressure", "Properties":{"Path":"$[\'diastolicPressure\']"}}]'
+
+.show table PatientIoTM ingestion mappings 
+
+
+//Sample scripts
+PatientIoTM
+| count 
+
+PatientIoTM
+| take 100
+
+
+// Create a function that will be used for update
+.create function 
+PatientVitalCriticalFunction()
+{
+    PatientIoTM
+    | where bodyTemperature > 101 and heartRate > 170 and systolicPressure > 160
+}
+
+// Create the target table (if it doesn't already exist)
+.set-or-append PatientCritical <| PatientVitalCriticalFunction() | limit 0
+
+// Use update policy on table DerivedTableX
+.alter table PatientCritical policy update 
+@'[{"IsEnabled": true, "Source": "PatientIoTM", "Query": "PatientVitalCriticalFunction()", "IsTransactional": false, "PropagateIngestionProperties": false}]'
+
+// Scripts that will be used in Logic Apps
+
+//Action : Patient Count
+PatientCritical
+| count 
+
+//Action : List of Patients
+PatientCritical
+
+
+// Action : Clear Table
+.clear async table PatientCritical data 

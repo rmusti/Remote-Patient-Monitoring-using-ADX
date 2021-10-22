@@ -1,0 +1,5 @@
+{"patientId":2345,"timeStamp":"2021-10-19T11:12:55.6861476+05:30","bodyTemperature":97.5,"heartRate":157,"spo2":99,"systolicPressure":119,"diastolicPressure":79}
+{"patientId":2545,"timeStamp":"2021-10-19T11:12:25.6861476+05:30","bodyTemperature":98.5,"heartRate":127,"spo2":97,"systolicPressure":109,"diastolicPressure":78}
+{"patientId":2845,"timeStamp":"2021-10-19T11:12:45.6861476+05:30","bodyTemperature":97.8,"heartRate":137,"spo2":98,"systolicPressure":129,"diastolicPressure":77}
+{"patientId":2385,"timeStamp":"2021-10-19T11:12:35.6861476+05:30","bodyTemperature":97.9,"heartRate":120,"spo2":96,"systolicPressure":139,"diastolicPressure":74}
+{"patientId":2395,"timeStamp":"2021-10-19T11:12:25.6861476+05:30","bodyTemperature":97.4,"heartRate":89,"spo2":95,"systolicPressure":134,"diastolicPressure":84}

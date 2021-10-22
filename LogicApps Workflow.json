@@ -1,0 +1,191 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "actions": {
+            "For_each": {
+                "actions": {
+                    "Condition": {
+                        "actions": {
+                            "Clear_Table": {
+                                "inputs": {
+                                    "body": {
+                                        "cluster": "https://rmustiadxcluster.eastus.kusto.windows.net",
+                                        "csl": ".clear async table PatientCritical data ",
+                                        "db": "healthcare"
+                                    },
+                                    "host": {
+                                        "connection": {
+                                            "name": "@parameters('$connections')['kusto']['connectionId']"
+                                        }
+                                    },
+                                    "method": "post",
+                                    "path": "/RunAsyncControlCommandAndWait"
+                                },
+                                "runAfter": {
+                                    "List_of_Patients": [
+                                        "Succeeded"
+                                    ]
+                                },
+                                "type": "ApiConnection"
+                            },
+                            "List_of_Patients": {
+                                "inputs": {
+                                    "body": {
+                                        "cluster": "https://rmustiadxcluster.eastus.kusto.windows.net",
+                                        "csl": "PatientCritical",
+                                        "db": "healthcare"
+                                    },
+                                    "host": {
+                                        "connection": {
+                                            "name": "@parameters('$connections')['kusto']['connectionId']"
+                                        }
+                                    },
+                                    "method": "post",
+                                    "path": "/ListKustoResults/false"
+                                },
+                                "runAfter": {},
+                                "type": "ApiConnection"
+                            }
+                        },
+                        "expression": {
+                            "and": [
+                                {
+                                    "greater": [
+                                        "@items('For_each')?['Count']",
+                                        0
+                                    ]
+                                }
+                            ]
+                        },
+                        "runAfter": {},
+                        "type": "If"
+                    },
+                    "Create_HTML_table_2": {
+                        "inputs": {
+                            "format": "HTML",
+                            "from": "@body('List_of_Patients')?['value']"
+                        },
+                        "runAfter": {
+                            "Condition": [
+                                "Succeeded"
+                            ]
+                        },
+                        "type": "Table"
+                    },
+                    "Send_an_email_(V2)_2": {
+                        "inputs": {
+                            "body": {
+                                "Body": "<p>@{variables('EmailBody1')}</p>",
+                                "Subject": "Needs Attention : Patients in Critial Condition.",
+                                "To": "ramusti@microsoft.com"
+                            },
+                            "host": {
+                                "connection": {
+                                    "name": "@parameters('$connections')['office365']['connectionId']"
+                                }
+                            },
+                            "method": "post",
+                            "path": "/v2/Mail"
+                        },
+                        "runAfter": {
+                            "Set_variable_2": [
+                                "Succeeded"
+                            ]
+                        },
+                        "type": "ApiConnection"
+                    },
+                    "Set_variable_2": {
+                        "inputs": {
+                            "name": "EmailBody1",
+                            "value": "<style>\ntable, th, td {\n  border: 1px solid black;\n  border-collapse: collapse;\n}\n<h1>Summary</h1>\n<table style =\"border:1px solid black; border-collapse: collapse;\">\n<td style =\"border:1px solid black; border-collapse: collapse;\"> @{body('Create_HTML_table_2')}</td>\n</table>\n<br/>"
+                        },
+                        "runAfter": {
+                            "Create_HTML_table_2": [
+                                "Succeeded"
+                            ]
+                        },
+                        "type": "SetVariable"
+                    }
+                },
+                "foreach": "@body('Patient_Count')?['value']",
+                "runAfter": {
+                    "Initialize_variable_2": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Foreach"
+            },
+            "Initialize_variable_2": {
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "EmailBody1",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "runAfter": {
+                    "Patient_Count": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable"
+            },
+            "Patient_Count": {
+                "inputs": {
+                    "body": {
+                        "cluster": "https://rmustiadxcluster.eastus.kusto.windows.net",
+                        "csl": "PatientCritical\n| count",
+                        "db": "healthcare"
+                    },
+                    "host": {
+                        "connection": {
+                            "name": "@parameters('$connections')['kusto']['connectionId']"
+                        }
+                    },
+                    "method": "post",
+                    "path": "/ListKustoResults/false"
+                },
+                "runAfter": {},
+                "type": "ApiConnection"
+            }
+        },
+        "contentVersion": "1.0.0.0",
+        "outputs": {},
+        "parameters": {
+            "$connections": {
+                "defaultValue": {},
+                "type": "Object"
+            }
+        },
+        "triggers": {
+            "Recurrence": {
+                "evaluatedRecurrence": {
+                    "frequency": "Minute",
+                    "interval": 1
+                },
+                "recurrence": {
+                    "frequency": "Minute",
+                    "interval": 1
+                },
+                "type": "Recurrence"
+            }
+        }
+    },
+    "parameters": {
+        "$connections": {
+            "value": {
+                "kusto": {
+                    "connectionId": "/subscriptions/f2e468ef-7cf1-411c-bef2-98509a126497/resourceGroups/ADXLearning/providers/Microsoft.Web/connections/kusto",
+                    "connectionName": "kusto",
+                    "id": "/subscriptions/f2e468ef-7cf1-411c-bef2-98509a126497/providers/Microsoft.Web/locations/eastus/managedApis/kusto"
+                },
+                "office365": {
+                    "connectionId": "/subscriptions/f2e468ef-7cf1-411c-bef2-98509a126497/resourceGroups/ADXLearning/providers/Microsoft.Web/connections/office365",
+                    "connectionName": "office365",
+                    "id": "/subscriptions/f2e468ef-7cf1-411c-bef2-98509a126497/providers/Microsoft.Web/locations/eastus/managedApis/office365"
+                }
+            }
+        }
+    }
+}
