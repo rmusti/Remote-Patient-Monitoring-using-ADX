@@ -7,7 +7,8 @@ For our use case where we are remotely monitoring patient vitals, Azure Data Exp
 
 ## Solution Architecture
 
- 
+![Solution Architecture](Solution Architecture.jpg)
+
 ## Data Flow
 1.	Patient Vitals like Heartbeat, Spo2, Body Temperature, Systolic and Diastolic pressure are collected and streamed using Medical Devices/IoMT. 
 2.	 The Streaming Data is collected either using IoT Hub or EventHub and then fed into Azure Data Explorer in Near Real Time
