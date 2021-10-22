@@ -10,7 +10,8 @@ namespace PatientIoTMFeed
     public class Program
     {
         private static EventHubClient eventHubClient;
-        private const string EventHubConnectionString = "Endpoint=sb://rmustieventhub.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=KM5aN6dTztB2feqaNIsf2EGuVu2imiuw4YEh1cPOHLk=";
+        // Provide your Eventhub Connection strings below. 
+        private const string EventHubConnectionString = "Endpoint=sb://rmustieventhub.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=K4YEh1cPOHLk=";
         private const string EventHubName = "patient_iotm_eventhub";
         private static bool SetRandomPartitionKey = false;
 
